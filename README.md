@@ -65,13 +65,13 @@ So if line is passing below the origin, it will have a positive rho and angle le
 ![Hough Transform](https://github.com/namansnegi/Lane-Lines/blob/master/images/7.png) 
 
 Above is the output of the HoughLinesP function in OpenCV (Python). The function takes the following arguments
-	image – 8-bit, single-channel binary source image. The image may be modified by the function.
-	lines – Output vector of lines. Each line is represented by a 4-element vector (x1, y1, x2, y2), where  (x1, y1) and (x2, y2)  are the ending points of each detected line segment.
-	rho – Distance resolution of the accumulator in pixels.
-	theta – Angle resolution of the accumulator in radians.
-	threshold – Accumulator threshold parameter. Only those lines are returned that get enough votes ( > threshold ).
-	minLineLength – Minimum line length. Line segments shorter than that are rejected.
-	maxLineGap – Maximum allowed gap between points on the same line to link them.
+- image – 8-bit, single-channel binary source image. The image may be modified by the function.
+- lines – Output vector of lines. Each line is represented by a 4-element vector (x1, y1, x2, y2), where  (x1, y1) and (x2, y2)  are the ending points of each detected line segment.
+- rho – Distance resolution of the accumulator in pixels.
+- theta – Angle resolution of the accumulator in radians.
+- threshold – Accumulator threshold parameter. Only those lines are returned that get enough votes ( > threshold ).
+- minLineLength – Minimum line length. Line segments shorter than that are rejected.
+- maxLineGap – Maximum allowed gap between points on the same line to link them.
 
 
 
