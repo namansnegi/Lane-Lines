@@ -3,72 +3,93 @@
 
 <img src="laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+## FINDING LANE LINES 
+The job of an autonomous car engineer is to teach the car how to drive by itself. The first step in achieving this task is to teach the car how to perceive the world around it. Perception is the ability to organize, identify and interpret sensory data in order to represent and understand the environment. While driving, a human driver uses his eyes to see and identify things like traffic signs, lane lines, corners, other vehicles etc. and takes the necessary control action accordingly. A car does not have eyes but things like cameras and sensors can give us information from which we can derive visual perception of the world around us. This article describes the process of using camera images to identify and track different objects while driving. We start by identifying lane lines in still images and then use the same process in a video stream to track the lane lines in real time. 
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+### FEATURE SELECTION
+Before we begin processing the data we first have identify the features that can be useful in figuring out where the lane lines are in an image. Some of the features that can be explored are colour, shape, orientation and position in the image. 
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you can install the starter kit or follow the install instructions below to get started on this project. ##
+#### Colour Selection
+Lane lines are generally of single colour like white or yellow. To identify lines based on colour we have to figure out how to select a specific colour in an image. Colour in case of digital images typically means that the image comprises of a stack of different images, e.g. red green and blue in case of RGB colour space. These images are sometimes referred to as colour channels and contain pixels whose value vary from 0 to 255 where 0 is the darkest possible value and 255 is the brightest. Hence pure white colour in a RGB image will have pixel value [255,255,255]. Hence combination of these three pixel values can help us in selecting any colour in an image. The figure below shows the output of the colour selection algorithm with threshold pixel values [200,200,200] i.e. any pixels below these threshold values were set to zero.    
 
-**Step 1:** Getting setup with Python
+#### Region of Interest
+Camera images contain lot of information and sometimes we do not need all this information as it would reduce the processing speed and also sometimes detect some other objects that aren't lane lines. Hence we would like to focus only in the area where we think the actual lane lines are. We can assume that the camera that took the image is mounted in a fixed position on the car, such that the lane lines will always appear in the same general region of the image and we would like to only consider pixels in this specific region for colour selection. 
+To select a particular region in the image we can manually choose variables for left, right, and apex to represent the vertices of a triangular region for colour selection, while masking everything else out. Any polygon shape can be used for this process. All pixels that lie outside the defined region are not considered in the colour selection process. The figure below shows the selected region of interest and the identified lane lines in that region.
+ 	
+#### Disadvantages of Using Colour Selection
+Although this method of identifying lane lines is quite straightforward and easy and gives relatively good results, it is not very robust. As it happens, lane lines are not always the same colour, and even lines of the same colour under different lighting conditions (day, night, etc) may fail to be detected by this method. We would now look into some computer vision techniques that would help us in writing a more robust algorithm. Computer vision involves using algorithms to help the computer see the world like we see it, full of depth, colour, shape and meaning. There are many techniques that can be used and in this article we will look into two of these techniques
 
-To do this project, you will need Python 3 along with the numpy, matplotlib, and OpenCV libraries, as well as Jupyter Notebook installed. 
+### CANNY EDGE DETECTION
+The Canny Edge detector was developed by John F. Canny in 1986. It is also known as the optimal detector. The concept is to find boundaries of an object in an image. Using this method we try to find edges by tracing the pixels that follow the strongest gradient. A grayscale image consists of points of varying brightness. Gradient of an image defines how fast the pixel values change at each point and in which direction is this change more predominant.  If we take the gradient of a grayscale image we get an image where the brightness of each pixel gives the strength of the gradient at that point. Rapid change in brightness is where we find edges. The strength of an edge is defined by the difference in values of adjacent pixels (i.e. the strength of the gradient).
 
-We recommend downloading and installing the Anaconda Python 3 distribution from Continuum Analytics because it comes prepackaged with many of the Python dependencies you will need for this and future projects, makes it easy to install OpenCV, and includes Jupyter Notebook.  Beyond that, it is one of the most common Python distributions used in data analytics and machine learning, so a great choice if you're getting started in the field.
+#### Noise Reduction
+Before computing the gradient for Canny edge detection, Gaussian smoothing is applied to the image to suppress noise and spurious gradients by averaging. Gaussian filtering is done by convolving each point in the input array with a Gaussian kernel and then summing them all to produce the output array. Kernel size for Gaussian smoothing can be any odd number where a large kernel size implies averaging, or smoothing, over a larger area. 
 
-Choose the appropriate Python 3 Anaconda install package for your operating system <A HREF="https://www.continuum.io/downloads" target="_blank">here</A>.   Download and install the package.
+Finding Intensity Gradient of the Image
+Gradient of an image can be derived using Sobel kernel in both horizontal and vertical direction. 
 
-If you already have Anaconda for Python 2 installed, you can create a separate environment for Python 3 and all the appropriate dependencies with the following command:
+G_x=[■(-1&0&+1@-1&0&+1@-1&0&+1)] 		G_y=[■(-1&-2&-1@0&0&0@-1&+2&+1)]
 
-`>  conda create --name=yourNewEnvironment python=3 anaconda`
+The overall magnitude and direction of the gradient can then be calculated as beow:
+Edge Gradient(G)=√(G_x^2+G_y^2 )
+Angle(Ө)=tan^(-1)⁡〖G_x/G_y 〗
+Gradient direction is always perpendicular to edges. It is rounded to one of four angles representing vertical, horizontal and two diagonal directions.
 
-`>  source activate yourNewEnvironment`
+#### Non-maximum Suppression
+The gradient method results in thick edges. Edge-thinning algorithm known as Non-max suppression (NMS) is applied which results in one pixel wide ridges from thick edges.  Edges must be placed at the points of maxima; or rather non-maxima must be suppressed. Non maximum suppression works by finding the pixel with the maximum value in an edge. The image is scanned along the image gradient direction, and if pixels are not part of the local maxima they are set to zero. The basic idea of NMS is that: If a pixel value is not greater than its neighbourhood pixels, then the pixel is not the edge (the scalar value of the pixel is set to zero).  The result is a binary image with "thin edges".
 
-**Step 2:** Installing OpenCV
+#### Hysteresis Thresholding
+This stage is used to eliminate the edges that could not be suppressed by non-maximum suppression and also to remove noise from the image. For this process we need two threshold values, low threshold and high threshold. Any edges with intensity gradient more than high threshold are categorized as strong edges and those below low threshold are considered as non-edges and hence discarded by setting their pixel value to 0. The edges in between these thresholds are considered weak edges.  Final step is to identify which of the weak edges is a real edge which is done based on their connectivity. If they are connected to strong edges then they are considered to be actual edges or else they are also discarded.
 
-Once you have Anaconda installed, first double check you are in your Python 3 environment:
+The figure below shows the grayscale image and the output of the Canny Edge detection process. 
 
-`>python`    
-`Python 3.5.2 |Anaconda 4.1.1 (x86_64)| (default, Jul  2 2016, 17:52:12)`  
-`[GCC 4.2.1 Compatible Apple LLVM 4.2 (clang-425.0.28)] on darwin`  
-`Type "help", "copyright", "credits" or "license" for more information.`  
-`>>>`   
-(Ctrl-d to exit Python)
+ 	 
 
-run the following commands at the terminal prompt to get OpenCV:
 
-`> pip install pillow`  
-`> conda install -c menpo opencv3=3.1.0`
 
-then to test if OpenCV is installed correctly:
 
-`> python`  
-`>>> import cv2`  
-`>>>`  (i.e. did not get an ImportError)
 
-(Ctrl-d to exit Python)
 
-**Step 3:** Installing moviepy  
 
-We recommend the "moviepy" package for processing video in this project (though you're welcome to use other packages if you prefer).  
 
-To install moviepy run:
 
-`>pip install moviepy`  
 
-and check that the install worked:
 
-`>python`  
-`>>>import moviepy`  
-`>>>`  (i.e. did not get an ImportError)
 
-(Ctrl-d to exit Python)
 
-**Step 4:** Opening the code in a Jupyter Notebook
 
-You will complete this project in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
 
-Jupyter is an ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, run the following command at the terminal prompt (be sure you're in your Python 3 environment!):
+### HOUGH TRANSFORM
+Canny Edge detection returns edges in the form of pixels (dots) that represent an edge. Next step is to join these dots. They can be joined to represent any kind of shape. But we are interested in looking for lines. For this we adopt a model of a line to fit the assortment of dots. A straight line can be defined by the equation y=mx+c where ‘m’ and ‘c’ represent the parameters of the line. In image space, a line is plotted as x vs. y, but in 1962, Paul Hough devised a method for representing lines in parameter space, which is known as “Hough space”.  The Hough Transform is just the conversion from image space to Hough space. So, the characterization of a line in image space will be a single point at the position (m, c) in Hough space.
+	
 
-`> jupyter notebook`
+All points on a line in image space intersect at a common point in parameter space. This common point (m, b) represents the line in image space. Unfortunately, the slope, m, is undefined when the line is vertical. To overcome this we can use polar co-ordinates. Each point in the image space now represents a sine curve in Hough space. 
+To convert the Cartesian form y=mx+c with parameters ‘m’, ‘b’ )to polar form with parameters ‘ρ’ ,’θ’ we define  as the perpendicular distance of the line from the origin and is the angle the perpendicular to the line makes with the axes. 
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+	
+
+y=mx+c
+y=c (when x=0)
+Hence c=ρ/sin⁡θ 
+now put y=0
+x=-ρ/(m sin⁡θ )
+cos⁡〖θ=ρ/((-ρ)⁄〖m sin〗⁡θ )〗
+Hence m= -cos⁡Ө/sin⁡Ө 
+y= -   cos⁡θ/sin⁡θ   x+ρ/sin⁡θ 
+
+So if line is passing below the origin, it will have a positive rho and angle less than 180. If it is going above the origin, instead of taking angle greater than 180, angle is taken less than 180, and rho is taken negative. Any vertical line will have 0 degree and horizontal lines will have 90 degree
+
+ 	 
+Above is the output of the HoughLinesP function in OpenCV (Python). The function takes the following arguments
+	image – 8-bit, single-channel binary source image. The image may be modified by the function.
+	lines – Output vector of lines. Each line is represented by a 4-element vector (x1, y1, x2, y2), where  (x1, y1) and (x2, y2)  are the ending points of each detected line segment.
+	rho – Distance resolution of the accumulator in pixels.
+	theta – Angle resolution of the accumulator in radians.
+	threshold – Accumulator threshold parameter. Only those lines are returned that get enough votes ( > threshold ).
+	minLineLength – Minimum line length. Line segments shorter than that are rejected.
+	maxLineGap – Maximum allowed gap between points on the same line to link them.
+
+
+
+
+
