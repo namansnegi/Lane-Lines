@@ -29,14 +29,15 @@ The Canny Edge detector was developed by John F. Canny in 1986. It is also known
 #### Noise Reduction
 Before computing the gradient for Canny edge detection, Gaussian smoothing is applied to the image to suppress noise and spurious gradients by averaging. Gaussian filtering is done by convolving each point in the input array with a Gaussian kernel and then summing them all to produce the output array. Kernel size for Gaussian smoothing can be any odd number where a large kernel size implies averaging, or smoothing, over a larger area. 
 
-Finding Intensity Gradient of the Image
+#### Finding Intensity Gradient of the Image
 Gradient of an image can be derived using Sobel kernel in both horizontal and vertical direction. 
 
-G_x=[■(-1&0&+1@-1&0&+1@-1&0&+1)] 		G_y=[■(-1&-2&-1@0&0&0@-1&+2&+1)]
+![Sobel](https://github.com/namansnegi/Lane-Lines/blob/master/images/10.png) 
 
 The overall magnitude and direction of the gradient can then be calculated as beow:
-Edge Gradient(G)=√(G_x^2+G_y^2 )
-Angle(Ө)=tan^(-1)⁡〖G_x/G_y 〗
+
+![Sobel Grads](https://github.com/namansnegi/Lane-Lines/blob/master/images/11.png)
+
 Gradient direction is always perpendicular to edges. It is rounded to one of four angles representing vertical, horizontal and two diagonal directions.
 
 #### Non-maximum Suppression
@@ -52,11 +53,11 @@ The figure below shows the grayscale image and the output of the Canny Edge dete
  	 
 ### HOUGH TRANSFORM
 Canny Edge detection returns edges in the form of pixels (dots) that represent an edge. Next step is to join these dots. They can be joined to represent any kind of shape. But we are interested in looking for lines. For this we adopt a model of a line to fit the assortment of dots. A straight line can be defined by the equation y=mx+c where ‘m’ and ‘c’ represent the parameters of the line. In image space, a line is plotted as x vs. y, but in 1962, Paul Hough devised a method for representing lines in parameter space, which is known as “Hough space”.  The Hough Transform is just the conversion from image space to Hough space. So, the characterization of a line in image space will be a single point at the position (m, c) in Hough space.
-	
+![Hough](https://github.com/namansnegi/Lane-Lines/blob/master/images/9.png) 	
 
 All points on a line in image space intersect at a common point in parameter space. This common point (m, b) represents the line in image space. Unfortunately, the slope, m, is undefined when the line is vertical. To overcome this we can use polar co-ordinates. Each point in the image space now represents a sine curve in Hough space. 
 To convert the Cartesian form y=mx+c with parameters ‘m’, ‘b’ )to polar form with parameters ‘ρ’ ,’θ’ we define  as the perpendicular distance of the line from the origin and is the angle the perpendicular to the line makes with the axes. 
-
+![Derive](https://github.com/namansnegi/Lane-Lines/blob/master/images/8.png) 
 y=mx+c
 y=c (when x=0)
 Hence c=ρ/sin⁡θ 
