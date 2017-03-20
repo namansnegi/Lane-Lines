@@ -32,11 +32,11 @@ Before computing the gradient for Canny edge detection, Gaussian smoothing is ap
 #### Finding Intensity Gradient of the Image
 Gradient of an image can be derived using Sobel kernel in both horizontal and vertical direction. 
 
-![Sobel](https://github.com/namansnegi/Lane-Lines/blob/master/images/10.png) 
+![Sobel](https://github.com/namansnegi/Lane-Lines/blob/master/images/10.PNG) 
 
 The overall magnitude and direction of the gradient can then be calculated as beow:
 
-![Sobel Grads](https://github.com/namansnegi/Lane-Lines/blob/master/images/11.png)
+![Sobel Grads](https://github.com/namansnegi/Lane-Lines/blob/master/images/11.PNG)
 
 Gradient direction is always perpendicular to edges. It is rounded to one of four angles representing vertical, horizontal and two diagonal directions.
 
@@ -53,11 +53,11 @@ The figure below shows the grayscale image and the output of the Canny Edge dete
  	 
 ### HOUGH TRANSFORM
 Canny Edge detection returns edges in the form of pixels (dots) that represent an edge. Next step is to join these dots. They can be joined to represent any kind of shape. But we are interested in looking for lines. For this we adopt a model of a line to fit the assortment of dots. A straight line can be defined by the equation y=mx+c where ‘m’ and ‘c’ represent the parameters of the line. In image space, a line is plotted as x vs. y, but in 1962, Paul Hough devised a method for representing lines in parameter space, which is known as “Hough space”.  The Hough Transform is just the conversion from image space to Hough space. So, the characterization of a line in image space will be a single point at the position (m, c) in Hough space.
-![Hough](https://github.com/namansnegi/Lane-Lines/blob/master/images/9.png) 	
+![Hough](https://github.com/namansnegi/Lane-Lines/blob/master/images/9.PNG) 	
 
 All points on a line in image space intersect at a common point in parameter space. This common point (m, b) represents the line in image space. Unfortunately, the slope, m, is undefined when the line is vertical. To overcome this we can use polar co-ordinates. Each point in the image space now represents a sine curve in Hough space. 
 To convert the Cartesian form y=mx+c with parameters ‘m’, ‘b’ )to polar form with parameters ‘ρ’ ,’θ’ we define  as the perpendicular distance of the line from the origin and is the angle the perpendicular to the line makes with the axes. 
-![Derive](https://github.com/namansnegi/Lane-Lines/blob/master/images/8.png) 
+![Derive](https://github.com/namansnegi/Lane-Lines/blob/master/images/8.PNG) 
 y=mx+c
 y=c (when x=0)
 Hence c=ρ/sin⁡θ 
