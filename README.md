@@ -73,7 +73,8 @@ Above is the output of the HoughLinesP function in OpenCV (Python). The function
 - minLineLength – Minimum line length. Line segments shorter than that are rejected.
 - maxLineGap – Maximum allowed gap between points on the same line to link them.
 
-
+### VIDEO STREAM PROCESSING
+We now test the whole process on a video stream whcih is just a combination of continuous images. The result is show below
 
 
 
