@@ -16,8 +16,10 @@ Lane lines are generally of single colour like white or yellow. To identify line
 #### Region of Interest
 Camera images contain lot of information and sometimes we do not need all this information as it would reduce the processing speed and also sometimes detect some other objects that aren't lane lines. Hence we would like to focus only in the area where we think the actual lane lines are. We can assume that the camera that took the image is mounted in a fixed position on the car, such that the lane lines will always appear in the same general region of the image and we would like to only consider pixels in this specific region for colour selection. 
 To select a particular region in the image we can manually choose variables for left, right, and apex to represent the vertices of a triangular region for colour selection, while masking everything else out. Any polygon shape can be used for this process. All pixels that lie outside the defined region are not considered in the colour selection process. The figure below shows the selected region of interest and the identified lane lines in that region.
+
 ![ROI Image](https://github.com/namansnegi/Lane-Lines/blob/master/images/3.png) 
-![ROI Lines](https://github.com/namansnegi/Lane-Lines/blob/master/images/4.png) 	
+![ROI Lines](https://github.com/namansnegi/Lane-Lines/blob/master/images/4.png)
+
 #### Disadvantages of Using Colour Selection
 Although this method of identifying lane lines is quite straightforward and easy and gives relatively good results, it is not very robust. As it happens, lane lines are not always the same colour, and even lines of the same colour under different lighting conditions (day, night, etc) may fail to be detected by this method. We would now look into some computer vision techniques that would help us in writing a more robust algorithm. Computer vision involves using algorithms to help the computer see the world like we see it, full of depth, colour, shape and meaning. There are many techniques that can be used and in this article we will look into two of these techniques
 
@@ -44,6 +46,7 @@ The gradient method results in thick edges. Edge-thinning algorithm known as Non
 This stage is used to eliminate the edges that could not be suppressed by non-maximum suppression and also to remove noise from the image. For this process we need two threshold values, low threshold and high threshold. Any edges with intensity gradient more than high threshold are categorized as strong edges and those below low threshold are considered as non-edges and hence discarded by setting their pixel value to 0. The edges in between these thresholds are considered weak edges.  Final step is to identify which of the weak edges is a real edge which is done based on their connectivity. If they are connected to strong edges then they are considered to be actual edges or else they are also discarded.
 
 The figure below shows the grayscale image and the output of the Canny Edge detection process. 
+
 ![GrayScale Image](https://github.com/namansnegi/Lane-Lines/blob/master/images/5.png) 
 ![Canny Edge](https://github.com/namansnegi/Lane-Lines/blob/master/images/6.png)
  	 
@@ -64,8 +67,10 @@ Hence m= -cos⁡Ө/sin⁡Ө
 y= -   cos⁡θ/sin⁡θ   x+ρ/sin⁡θ 
 
 So if line is passing below the origin, it will have a positive rho and angle less than 180. If it is going above the origin, instead of taking angle greater than 180, angle is taken less than 180, and rho is taken negative. Any vertical line will have 0 degree and horizontal lines will have 90 degree
+
 ![Canny Edge](https://github.com/namansnegi/Lane-Lines/blob/master/images/6.png) 
 ![Hough Transform](https://github.com/namansnegi/Lane-Lines/blob/master/images/7.png) 
+
 Above is the output of the HoughLinesP function in OpenCV (Python). The function takes the following arguments
 	image – 8-bit, single-channel binary source image. The image may be modified by the function.
 	lines – Output vector of lines. Each line is represented by a 4-element vector (x1, y1, x2, y2), where  (x1, y1) and (x2, y2)  are the ending points of each detected line segment.
