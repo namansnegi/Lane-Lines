@@ -58,14 +58,6 @@ Canny Edge detection returns edges in the form of pixels (dots) that represent a
 All points on a line in image space intersect at a common point in parameter space. This common point (m, b) represents the line in image space. Unfortunately, the slope, m, is undefined when the line is vertical. To overcome this we can use polar co-ordinates. Each point in the image space now represents a sine curve in Hough space. 
 To convert the Cartesian form y=mx+c with parameters ‘m’, ‘b’ )to polar form with parameters ‘ρ’ ,’θ’ we define  as the perpendicular distance of the line from the origin and is the angle the perpendicular to the line makes with the axes. 
 ![Derive](https://github.com/namansnegi/Lane-Lines/blob/master/images/8.PNG) 
-y=mx+c
-y=c (when x=0)
-Hence c=ρ/sin⁡θ 
-now put y=0
-x=-ρ/(m sin⁡θ )
-cos⁡〖θ=ρ/((-ρ)⁄〖m sin〗⁡θ )〗
-Hence m= -cos⁡Ө/sin⁡Ө 
-y= -   cos⁡θ/sin⁡θ   x+ρ/sin⁡θ 
 
 So if line is passing below the origin, it will have a positive rho and angle less than 180. If it is going above the origin, instead of taking angle greater than 180, angle is taken less than 180, and rho is taken negative. Any vertical line will have 0 degree and horizontal lines will have 90 degree
 
